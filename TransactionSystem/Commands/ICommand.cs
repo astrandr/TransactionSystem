@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using TransactionSystem.Core;
 
 namespace TransactionSystem.UI.Commands
 {
     public interface ICommand
     {
-        CommandResult Execute(Context context);
+        CommandResult Execute(IAccountService accountService);
     }
 }

@@ -7,7 +7,6 @@ namespace TransactionSystem.UI
     public class ShellProcessor
     {
         private readonly List<ICommandInterpreter> interpreters;
-        private readonly Context context;
 
         private const string UnknownCommandMessage = "Unknown command";
         private const string InvalidCommandMessage = "Invalid command structure/parameters";
@@ -20,8 +19,9 @@ namespace TransactionSystem.UI
             "withdraw : {account number}, {withdrawal amount}",
             "quit - will exit"
         };
+        private readonly IAccountService accountService;
 
-        public ShellProcessor(Context context)
+        public ShellProcessor(IAccountService accountService)
         {
             interpreters = new List<ICommandInterpreter>();
 
@@ -29,8 +29,7 @@ namespace TransactionSystem.UI
             interpreters.Add(new GetBalanceCommandInterpreter());
             interpreters.Add(new DepositCommandInterpreter());
             interpreters.Add(new WithdrawCommandInterpreter());
-
-            this.context = context;
+            this.accountService = accountService;
         }
 
         public string ProcessCommandLine(string commandLine)
@@ -41,7 +40,7 @@ namespace TransactionSystem.UI
 
             if (foundMatch.Command != null)
             {
-                var commandResult = foundMatch.Command.Execute(context);
+                var commandResult = foundMatch.Command.Execute(accountService);
 
                 if (commandResult.CommandResultStatus != CommandResultStatus.Success)
                 {

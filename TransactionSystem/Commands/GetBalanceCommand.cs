@@ -12,11 +12,11 @@ namespace TransactionSystem.UI.Commands
             this.accountNumber = accountNumber;
         }
 
-        public CommandResult Execute(Context context)
+        public CommandResult Execute(IAccountService accountService)
         {
             try
             {
-                var serviceResult = context.AccountService.GetAccountBalance(accountNumber);
+                var serviceResult = accountService.GetAccountBalance(accountNumber);
 
                 if (serviceResult.Status == AccountServiceResultsStatus.Success)
                 {

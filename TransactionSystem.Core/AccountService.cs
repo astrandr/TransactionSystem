@@ -2,12 +2,12 @@
 {
     public class AccountService : IAccountService
     {
-        private readonly AccountRepository accountRepository;
         private static readonly Dictionary<string, object> accountLocks = new Dictionary<string, object>();
+        private readonly IAccountRepository accountRepository;
 
-        public AccountService()
+        public AccountService(IAccountRepository accountRepository)
         {
-            accountRepository = new AccountRepository();
+            this.accountRepository = accountRepository;
         }
 
         public AccountServiceResult CreateAccount(string userName, string accountNumber, decimal depositAmount)

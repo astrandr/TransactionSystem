@@ -13,9 +13,9 @@ namespace TransactionSystem.UI.Commands
             this.depositAmount = depositAmount;
         }
 
-        public CommandResult Execute(Context context)
+        public CommandResult Execute(IAccountService accountService)
         {
-            var serviceResult = context.AccountService.Deposit(accountNumber, depositAmount);
+            var serviceResult = accountService.Deposit(accountNumber, depositAmount);
 
             if (serviceResult.Status == AccountServiceResultsStatus.Success)
             {

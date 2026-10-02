@@ -1,4 +1,4 @@
-﻿using TransactionSystem.UI.Commands;
+﻿using TransactionSystem.Core;
 
 namespace TransactionSystem.UI
 {
@@ -6,8 +6,9 @@ namespace TransactionSystem.UI
     {
         static void Main(string[] args)
         {
-            var context = new Context();
-            var processor = new ShellProcessor(context);
+            var accountRepository = new AccountRepository();
+            var accountService = new AccountService(accountRepository);
+            var processor = new ShellProcessor(accountService);
 
             Console.WriteLine("Usage:");
             WriteHelpLines();

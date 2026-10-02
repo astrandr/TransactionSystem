@@ -15,11 +15,11 @@ namespace TransactionSystem.UI.Commands
             this.depositAmount = depositAmount;
         }
 
-        public CommandResult Execute(Context context)
+        public CommandResult Execute(IAccountService accountService)
         {
             try
             {
-                var serviceResult = context.AccountService.CreateAccount(userName, accountNumber, depositAmount);
+                var serviceResult = accountService.CreateAccount(userName, accountNumber, depositAmount);
                 if (serviceResult.Status == AccountServiceResultsStatus.Success)
                 {
                     return new CommandResult() { CommandResultStatus = CommandResultStatus.Success };

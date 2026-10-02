@@ -1,6 +1,6 @@
 ﻿namespace TransactionSystem.Core
 {
-    public class AccountRepository
+    public class AccountRepository : IAccountRepository
     {
         private Dictionary<string, Account> accounts = new Dictionary<string, Account>();
 

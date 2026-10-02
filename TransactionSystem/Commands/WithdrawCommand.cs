@@ -13,11 +13,11 @@ namespace TransactionSystem.UI.Commands
             this.depositAmount = depositAmount;
         }
 
-        public CommandResult Execute(Context context)
+        public CommandResult Execute(IAccountService accountService)
         {
             try
             {
-                var serviceResult = context.AccountService.Withdraw(accountNumber, depositAmount);
+                var serviceResult = accountService.Withdraw(accountNumber, depositAmount);
 
                 if (serviceResult.Status == AccountServiceResultsStatus.Success)
                 {
