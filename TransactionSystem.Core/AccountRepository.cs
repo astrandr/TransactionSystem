@@ -1,30 +1,19 @@
-﻿namespace TransactionSystem.Core
+﻿using System.Collections.Concurrent;
+
+namespace TransactionSystem.Core
 {
     public class AccountRepository : IAccountRepository
     {
-        private Dictionary<string, Account> accounts = new Dictionary<string, Account>();
+        private ConcurrentDictionary<string, Account> accounts = new ConcurrentDictionary<string, Account>();
 
         public bool TryGetAccount(string accountId, out Account account)
         {
-            if (accounts.ContainsKey(accountId))
-            {
-                account = accounts[accountId];
-                return true;
-            }
-
-            account = null;
-            return false;
+            return accounts.TryGetValue(accountId, out account);
         }
 
         public bool AddAccount(string accountId, Account account)
         {
-            if (!accounts.ContainsKey(accountId))
-            {
-                accounts.Add(accountId, account);
-                return true;
-            }
-
-            return false;
+            return accounts.TryAdd(accountId, account);
         }
     }
 }
