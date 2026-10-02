@@ -106,9 +106,27 @@
 
         public AccountServiceResult Transfer(string srcAccountNumber, string destAccountNumber, decimal transferAmount)
         {
-            var firstLock = accountLocks[string.CompareOrdinal(srcAccountNumber, destAccountNumber) < 0 ? srcAccountNumber : destAccountNumber];
+            var firstLockAccountNumber = string.CompareOrdinal(srcAccountNumber, destAccountNumber) < 0 ? srcAccountNumber : destAccountNumber;
 
-            var secondLock = accountLocks[string.CompareOrdinal(srcAccountNumber, destAccountNumber) < 0 ? destAccountNumber : srcAccountNumber];
+            var secondLockAccountNumber = string.CompareOrdinal(srcAccountNumber, destAccountNumber) < 0 ? destAccountNumber : srcAccountNumber;
+
+            object firstLock, secondLock;
+
+            lock (accountLocks)
+            {
+                if (!accountLocks.ContainsKey(firstLockAccountNumber))
+                {
+                    return new AccountServiceResult() { Status = AccountServiceResultsStatus.NonExistingSourceAccount };
+                }
+
+                if (!accountLocks.ContainsKey(firstLockAccountNumber))
+                {
+                    return new AccountServiceResult() { Status = AccountServiceResultsStatus.NonExistingDestAccount };
+                }
+
+                firstLock = accountLocks[firstLockAccountNumber];
+                secondLock = accountLocks[secondLockAccountNumber];
+            }
 
             lock (firstLock)
             {
