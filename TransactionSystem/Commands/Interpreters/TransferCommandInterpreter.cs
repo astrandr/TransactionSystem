@@ -26,9 +26,14 @@
             var destinationAccountNumber = parameters[1];
             var transferAmount = parameters[2];
 
+            if (sourceAccountNumber == destinationAccountNumber)
+            {
+                return new InterpreterResult() { Matched = true, Command = null, Status = InterpreterResultStatus.IncorrectParameters };
+            }
+
             if (decimal.TryParse(transferAmount, out decimal transferAmountValue))
             {
-                if (transferAmountValue < 0)
+                if (transferAmountValue <= 0)
                 {
                     return new InterpreterResult() { Matched = true, Command = null, Status = InterpreterResultStatus.InvalidValue };
                 }

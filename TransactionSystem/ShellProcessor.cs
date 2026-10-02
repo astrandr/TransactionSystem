@@ -17,6 +17,7 @@ namespace TransactionSystem.UI
             "balance : {account number} ",
             "deposit : {account number}, {deposit amount}",
             "withdraw : {account number}, {withdrawal amount}",
+            "transfer : {source account number}, {destination account number}, {transfer amount}",
             "quit - will exit"
         };
         private readonly IAccountService accountService;

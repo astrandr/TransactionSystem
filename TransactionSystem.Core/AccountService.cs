@@ -68,7 +68,7 @@
                     return new AccountServiceResult() { Status = AccountServiceResultsStatus.NonExistingAccount };
                 }
             }
-            
+
             lock (accountLocks[accountNumber])
             {
                 if (withdrawAmount > account.Amount)
@@ -106,27 +106,36 @@
 
         public AccountServiceResult Transfer(string srcAccountNumber, string destAccountNumber, decimal transferAmount)
         {
-            lock (accountLocks)
+            var firstLock = accountLocks[string.CompareOrdinal(srcAccountNumber, destAccountNumber) < 0 ? srcAccountNumber : destAccountNumber];
+
+            var secondLock = accountLocks[string.CompareOrdinal(srcAccountNumber, destAccountNumber) < 0 ? destAccountNumber : srcAccountNumber];
+
+            lock (firstLock)
             {
-                if (!accountRepository.TryGetAccount(srcAccountNumber, out Account srcAccount))
+                lock (secondLock)
                 {
-                    return new AccountServiceResult() { Status = AccountServiceResultsStatus.NonExistingSourceAccount };
+
+                    if (!accountRepository.TryGetAccount(srcAccountNumber, out Account srcAccount))
+                    {
+                        return new AccountServiceResult() { Status = AccountServiceResultsStatus.NonExistingSourceAccount };
+                    }
+
+                    if (!accountRepository.TryGetAccount(destAccountNumber, out Account destAccount))
+                    {
+                        return new AccountServiceResult() { Status = AccountServiceResultsStatus.NonExistingDestAccount };
+                    }
+
+
+                    if (transferAmount > srcAccount.Amount)
+                    {
+                        return new AccountServiceResult() { Status = AccountServiceResultsStatus.InsufficientFunds };
+                    }
+
+                    destAccount.Amount += transferAmount;
+                    srcAccount.Amount -= transferAmount;
+
+                    return new AccountServiceResult() { Status = AccountServiceResultsStatus.Success };
                 }
-
-                if (!accountRepository.TryGetAccount(destAccountNumber, out Account destAccount))
-                {
-                    return new AccountServiceResult() { Status = AccountServiceResultsStatus.NonExistingDestAccount };
-                }
-
-
-                if (transferAmount > srcAccount.Amount)
-                {
-                    return new AccountServiceResult() { Status = AccountServiceResultsStatus.InsufficientFunds };
-                }
-
-                destAccount.Amount += transferAmount;
-
-                return new AccountServiceResult() { Status = AccountServiceResultsStatus.Success };
             }
         }
     }
