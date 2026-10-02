@@ -46,11 +46,11 @@ namespace TransactionSystem.UI
 
                 if (commandResult.CommandResultStatus != CommandResultStatus.Success)
                 {
-                    Console.WriteLine(TranslateCommandResult(commandResult));
+                    return TranslateCommandResult(commandResult);
                 }
                 else if(commandResult.HasReturn)
                 {
-                    Console.WriteLine($":{commandResult.Amount}");
+                    return $":{commandResult.Amount}";
                 }
 
                 return string.Empty;

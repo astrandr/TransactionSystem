@@ -67,18 +67,18 @@
                 {
                     return new AccountServiceResult() { Status = AccountServiceResultsStatus.NonExistingAccount };
                 }
-
-                lock (accountLocks[accountNumber])
+            }
+            
+            lock (accountLocks[accountNumber])
+            {
+                if (withdrawAmount > account.Amount)
                 {
-                    if (withdrawAmount > account.Amount)
-                    {
-                        return new AccountServiceResult() { Status = AccountServiceResultsStatus.InsufficientFunds };
-                    }
-
-                    account.Amount -= withdrawAmount;
-
-                    return new AccountServiceResult() { Status = AccountServiceResultsStatus.Success };
+                    return new AccountServiceResult() { Status = AccountServiceResultsStatus.InsufficientFunds };
                 }
+
+                account.Amount -= withdrawAmount;
+
+                return new AccountServiceResult() { Status = AccountServiceResultsStatus.Success };
             }
         }
 

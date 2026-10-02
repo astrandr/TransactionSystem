@@ -1,7 +1,4 @@
-﻿using System.Security.Cryptography.X509Certificates;
-using System.Security.Principal;
-
-namespace TransactionSystem.Core
+﻿namespace TransactionSystem.Core
 {
     public class AccountRepository
     {
