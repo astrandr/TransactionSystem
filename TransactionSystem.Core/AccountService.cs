@@ -2,7 +2,7 @@
 {
     public class AccountService : IAccountService
     {
-        private static readonly Dictionary<string, object> accountLocks = new Dictionary<string, object>();
+        private readonly Dictionary<string, object> accountLocks = new ();
         private readonly IAccountRepository accountRepository;
 
         public AccountService(IAccountRepository accountRepository)
