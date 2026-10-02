@@ -66,10 +66,12 @@ namespace TransactionSystem.Core
                 return new AccountServiceResult() { Status = AccountServiceResultsStatus.InvalidAmountValue };
             }
 
-
-            if (!accountRepository.TryGetAccount(accountNumber, out account))
+            lock (accountLocks)
             {
-                return new AccountServiceResult() { Status = AccountServiceResultsStatus.NonExistingAccount };
+                if (!accountRepository.TryGetAccount(accountNumber, out account))
+                {
+                    return new AccountServiceResult() { Status = AccountServiceResultsStatus.NonExistingAccount };
+                }
             }
 
             lock (accountLocks[accountNumber])
@@ -89,10 +91,12 @@ namespace TransactionSystem.Core
         {
             Account account;
 
-
-            if (!accountRepository.TryGetAccount(accountNumber, out account))
+            lock (accountLocks)
             {
-                return new AccountServiceResult() { Status = AccountServiceResultsStatus.NonExistingAccount };
+                if (!accountRepository.TryGetAccount(accountNumber, out account))
+                {
+                    return new AccountServiceResult() { Status = AccountServiceResultsStatus.NonExistingAccount };
+                }
             }
 
             decimal accountbalance = 0;
@@ -116,15 +120,17 @@ namespace TransactionSystem.Core
             var secondLockAccountNumber = string.CompareOrdinal(srcAccountNumber, destAccountNumber) < 0 ? destAccountNumber : srcAccountNumber;
 
             object firstLock, secondLock;
+            lock (accountLocks)
+            {
+                if (!accountLocks.ContainsKey(srcAccountNumber))
+                    return new AccountServiceResult() { Status = AccountServiceResultsStatus.NonExistingSourceAccount };
 
-            if (!accountLocks.ContainsKey(srcAccountNumber))
-                return new AccountServiceResult() { Status = AccountServiceResultsStatus.NonExistingSourceAccount };
+                if (!accountLocks.ContainsKey(destAccountNumber))
+                    return new AccountServiceResult() { Status = AccountServiceResultsStatus.NonExistingDestAccount };
 
-            if (!accountLocks.ContainsKey(destAccountNumber))
-                return new AccountServiceResult() { Status = AccountServiceResultsStatus.NonExistingDestAccount };
-
-            firstLock = accountLocks[firstLockAccountNumber];
-            secondLock = accountLocks[secondLockAccountNumber];
+                firstLock = accountLocks[firstLockAccountNumber];
+                secondLock = accountLocks[secondLockAccountNumber];
+            }
 
             lock (firstLock)
             {
