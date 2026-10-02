@@ -17,26 +17,18 @@ namespace TransactionSystem.UI.Commands
 
         public CommandResult Execute(IAccountService accountService)
         {
-            try
+            var serviceResult = accountService.CreateAccount(userName, accountNumber, depositAmount);
+            if (serviceResult.Status == AccountServiceResultsStatus.Success)
             {
-                var serviceResult = accountService.CreateAccount(userName, accountNumber, depositAmount);
-                if (serviceResult.Status == AccountServiceResultsStatus.Success)
-                {
-                    return new CommandResult() { CommandResultStatus = CommandResultStatus.Success };
-                }
-                else
-                {
-                    return new CommandResult()
-                    {
-                        CommandResultStatus = CommandResultStatus.ServiceError,
-                        AccountServiceResult = serviceResult
-                    };
-                }
-
+                return new CommandResult() { CommandResultStatus = CommandResultStatus.Success };
             }
-            catch
+            else
             {
-                return new CommandResult() { CommandResultStatus = CommandResultStatus.UknownError };
+                return new CommandResult()
+                {
+                    CommandResultStatus = CommandResultStatus.ServiceError,
+                    AccountServiceResult = serviceResult
+                };
             }
         }
     }

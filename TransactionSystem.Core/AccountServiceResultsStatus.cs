@@ -6,6 +6,8 @@
         ExistingAccount,
         NonExistingAccount,
         InsufficientFunds,
-        InvalidAmountValue
+        InvalidAmountValue,
+        NonExistingSourceAccount,
+        NonExistingDestAccount,
     }
 }

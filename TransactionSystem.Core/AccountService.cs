@@ -103,5 +103,31 @@
 
             return new AccountServiceResult() { Status = AccountServiceResultsStatus.Success, Amount = accountbalance };
         }
+
+        public AccountServiceResult Transfer(string srcAccountNumber, string destAccountNumber, decimal transferAmount)
+        {
+            lock (accountLocks)
+            {
+                if (!accountRepository.TryGetAccount(srcAccountNumber, out Account srcAccount))
+                {
+                    return new AccountServiceResult() { Status = AccountServiceResultsStatus.NonExistingSourceAccount };
+                }
+
+                if (!accountRepository.TryGetAccount(destAccountNumber, out Account destAccount))
+                {
+                    return new AccountServiceResult() { Status = AccountServiceResultsStatus.NonExistingDestAccount };
+                }
+
+
+                if (transferAmount > srcAccount.Amount)
+                {
+                    return new AccountServiceResult() { Status = AccountServiceResultsStatus.InsufficientFunds };
+                }
+
+                destAccount.Amount += transferAmount;
+
+                return new AccountServiceResult() { Status = AccountServiceResultsStatus.Success };
+            }
+        }
     }
 }

@@ -29,6 +29,8 @@ namespace TransactionSystem.UI
             interpreters.Add(new GetBalanceCommandInterpreter());
             interpreters.Add(new DepositCommandInterpreter());
             interpreters.Add(new WithdrawCommandInterpreter());
+            interpreters.Add(new TransferCommandInterpreter());
+
             this.accountService = accountService;
         }
 
@@ -40,16 +42,24 @@ namespace TransactionSystem.UI
 
             if (foundMatch.Command != null)
             {
-                var commandResult = foundMatch.Command.Execute(accountService);
+                try
+                {
+                    var commandResult = foundMatch.Command.Execute(accountService);
 
-                if (commandResult.CommandResultStatus != CommandResultStatus.Success)
-                {
-                    return TranslateCommandResult(commandResult);
+                    if (commandResult.CommandResultStatus != CommandResultStatus.Success)
+                    {
+                        return TranslateCommandResult(commandResult);
+                    }
+                    else if (commandResult.HasReturn)
+                    {
+                        return $":{commandResult.Amount}";
+                    }
                 }
-                else if(commandResult.HasReturn)
+                catch (Exception)
                 {
-                    return $":{commandResult.Amount}";
+                    return "Unexpected error occured.";
                 }
+
 
                 return string.Empty;
             }
@@ -86,9 +96,11 @@ namespace TransactionSystem.UI
             switch (result.Status)
             {
                 case AccountServiceResultsStatus.InsufficientFunds: return "Insufficient funds";
-                case AccountServiceResultsStatus.NonExistingAccount: return "Non existing account";
+                case AccountServiceResultsStatus.NonExistingAccount: return "Account does not exist";
                 case AccountServiceResultsStatus.ExistingAccount: return "Existing account";
                 case AccountServiceResultsStatus.InvalidAmountValue: return "Invalid amount";
+                case AccountServiceResultsStatus.NonExistingSourceAccount: return "Source account does not exist";
+                case AccountServiceResultsStatus.NonExistingDestAccount: return "Destination account does not exist";
             }
 
             return string.Empty;

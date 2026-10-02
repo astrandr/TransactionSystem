@@ -2,21 +2,22 @@
 
 namespace TransactionSystem.UI.Commands
 {
-    public class WithdrawCommand : ICommand
+    public class TransferCommand : ICommand
     {
-        private readonly string accountNumber;
-        private readonly decimal depositAmount;
+        private readonly string sourceAccountNumber;
+        private readonly string destAccountNumber;
+        private readonly decimal transferAmount;
 
-        public WithdrawCommand(string accountNumber, decimal depositAmount)
+        public TransferCommand(string sourceAccountNumber, string destAccountNumber, decimal transferAmount)
         {
-            this.accountNumber = accountNumber;
-            this.depositAmount = depositAmount;
+            this.sourceAccountNumber = sourceAccountNumber;
+            this.destAccountNumber = destAccountNumber;
+            this.transferAmount = transferAmount;
         }
 
         public CommandResult Execute(IAccountService accountService)
         {
-
-            var serviceResult = accountService.Withdraw(accountNumber, depositAmount);
+            var serviceResult = accountService.Transfer(sourceAccountNumber, destAccountNumber, transferAmount);
 
             if (serviceResult.Status == AccountServiceResultsStatus.Success)
             {

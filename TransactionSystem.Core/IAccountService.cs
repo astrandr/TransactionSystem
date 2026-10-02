@@ -9,5 +9,7 @@
         AccountServiceResult Deposit(string accountNumber, decimal depositAmount);
 
         AccountServiceResult Withdraw(string accountNumber, decimal depositAmount);
+
+        AccountServiceResult Transfer(string srcAccountNumber, string destAccountNumber, decimal depositAmount);
     }
 }
