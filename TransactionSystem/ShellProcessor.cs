@@ -1,5 +1,4 @@
-﻿using System.Text.RegularExpressions;
-using TransactionSystem.Core;
+﻿using TransactionSystem.Core;
 using TransactionSystem.UI.Commands;
 using TransactionSystem.UI.Commands.Interpreters;
 
