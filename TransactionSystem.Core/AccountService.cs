@@ -119,7 +119,7 @@
                     return new AccountServiceResult() { Status = AccountServiceResultsStatus.NonExistingSourceAccount };
                 }
 
-                if (!accountLocks.ContainsKey(firstLockAccountNumber))
+                if (!accountLocks.ContainsKey(secondLockAccountNumber))
                 {
                     return new AccountServiceResult() { Status = AccountServiceResultsStatus.NonExistingDestAccount };
                 }
