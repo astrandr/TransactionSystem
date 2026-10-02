@@ -1,8 +1,10 @@
-﻿namespace TransactionSystem.Core
+﻿using System.Collections.Concurrent;
+
+namespace TransactionSystem.Core
 {
     public class AccountService : IAccountService
     {
-        private readonly Dictionary<string, object> accountLocks = new ();
+        private readonly ConcurrentDictionary<string, object> accountLocks = new();
         private readonly IAccountRepository accountRepository;
 
         public AccountService(IAccountRepository accountRepository)
@@ -25,10 +27,11 @@
                 }
 
                 accountRepository.AddAccount(accountNumber, new Account() { Number = accountNumber, User = userName, Amount = depositAmount });
-                accountLocks.Add(accountNumber, new object());
+
+                accountLocks.TryAdd(accountNumber, new object());
             }
 
-            return new AccountServiceResult() { Status = AccountServiceResultsStatus.Success, Amount = 0 };
+            return new AccountServiceResult() { Status = AccountServiceResultsStatus.Success, Amount = depositAmount };
         }
 
         public AccountServiceResult Deposit(string accountNumber, decimal depositAmount)
@@ -40,12 +43,9 @@
 
             Account account;
 
-            lock (accountLocks)
+            if (!accountRepository.TryGetAccount(accountNumber, out account))
             {
-                if (!accountRepository.TryGetAccount(accountNumber, out account))
-                {
-                    return new AccountServiceResult() { Status = AccountServiceResultsStatus.NonExistingAccount };
-                }
+                return new AccountServiceResult() { Status = AccountServiceResultsStatus.NonExistingAccount };
             }
 
             lock (accountLocks[accountNumber])
@@ -61,12 +61,15 @@
 
             Account account;
 
-            lock (accountLocks)
+            if (withdrawAmount <= 0)
             {
-                if (!accountRepository.TryGetAccount(accountNumber, out account))
-                {
-                    return new AccountServiceResult() { Status = AccountServiceResultsStatus.NonExistingAccount };
-                }
+                return new AccountServiceResult() { Status = AccountServiceResultsStatus.InvalidAmountValue };
+            }
+
+
+            if (!accountRepository.TryGetAccount(accountNumber, out account))
+            {
+                return new AccountServiceResult() { Status = AccountServiceResultsStatus.NonExistingAccount };
             }
 
             lock (accountLocks[accountNumber])
@@ -84,15 +87,12 @@
 
         public AccountServiceResult GetAccountBalance(string accountNumber)
         {
-
             Account account;
 
-            lock (accountLocks)
+
+            if (!accountRepository.TryGetAccount(accountNumber, out account))
             {
-                if (!accountRepository.TryGetAccount(accountNumber, out account))
-                {
-                    return new AccountServiceResult() { Status = AccountServiceResultsStatus.NonExistingAccount };
-                }
+                return new AccountServiceResult() { Status = AccountServiceResultsStatus.NonExistingAccount };
             }
 
             decimal accountbalance = 0;
@@ -106,29 +106,30 @@
 
         public AccountServiceResult Transfer(string srcAccountNumber, string destAccountNumber, decimal transferAmount)
         {
+            if (transferAmount <= 0)
+            {
+                return new AccountServiceResult() { Status = AccountServiceResultsStatus.InvalidAmountValue };
+            }
+
             var firstLockAccountNumber = string.CompareOrdinal(srcAccountNumber, destAccountNumber) < 0 ? srcAccountNumber : destAccountNumber;
 
             var secondLockAccountNumber = string.CompareOrdinal(srcAccountNumber, destAccountNumber) < 0 ? destAccountNumber : srcAccountNumber;
 
             object firstLock, secondLock;
 
-            lock (accountLocks)
-            {
-                if (!accountLocks.ContainsKey(srcAccountNumber))
-                    return new AccountServiceResult() { Status = AccountServiceResultsStatus.NonExistingSourceAccount };
+            if (!accountLocks.ContainsKey(srcAccountNumber))
+                return new AccountServiceResult() { Status = AccountServiceResultsStatus.NonExistingSourceAccount };
 
-                if (!accountLocks.ContainsKey(destAccountNumber))
-                    return new AccountServiceResult() { Status = AccountServiceResultsStatus.NonExistingDestAccount };
+            if (!accountLocks.ContainsKey(destAccountNumber))
+                return new AccountServiceResult() { Status = AccountServiceResultsStatus.NonExistingDestAccount };
 
-                firstLock = accountLocks[firstLockAccountNumber];
-                secondLock = accountLocks[secondLockAccountNumber];
-            }
+            firstLock = accountLocks[firstLockAccountNumber];
+            secondLock = accountLocks[secondLockAccountNumber];
 
             lock (firstLock)
             {
                 lock (secondLock)
                 {
-
                     if (!accountRepository.TryGetAccount(srcAccountNumber, out Account srcAccount))
                     {
                         return new AccountServiceResult() { Status = AccountServiceResultsStatus.NonExistingSourceAccount };

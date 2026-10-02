@@ -26,6 +26,11 @@
             var destinationAccountNumber = parameters[1];
             var transferAmount = parameters[2];
 
+            if (string.IsNullOrEmpty(sourceAccountNumber) || string.IsNullOrEmpty(destinationAccountNumber) || string.IsNullOrEmpty(transferAmount))
+            {
+                return new InterpreterResult() { Matched = true, Command = null, Status = InterpreterResultStatus.InvalidValue };
+            }
+
             if (sourceAccountNumber == destinationAccountNumber)
             {
                 return new InterpreterResult() { Matched = true, Command = null, Status = InterpreterResultStatus.IncorrectParameters };

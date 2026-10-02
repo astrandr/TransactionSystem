@@ -26,8 +26,18 @@
             var accountNumber = parameters[1];
             var depositAmount = parameters[2];
 
+            if (string.IsNullOrWhiteSpace(userName) || string.IsNullOrWhiteSpace(accountNumber))
+            {
+                return new InterpreterResult() { Matched = true, Command = null, Status = InterpreterResultStatus.IncorrectParameters };
+            }
+
             if (decimal.TryParse(depositAmount, out decimal depositAmountValue))
             {
+                if (depositAmountValue <= 0)
+                {
+                    return new InterpreterResult() { Matched = true, Command = null, Status = InterpreterResultStatus.InvalidValue };
+                }
+
                 return new InterpreterResult()
                 {
                     Matched = true,

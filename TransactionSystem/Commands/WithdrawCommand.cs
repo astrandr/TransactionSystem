@@ -15,12 +15,11 @@ namespace TransactionSystem.UI.Commands
 
         public CommandResult Execute(IAccountService accountService)
         {
-
             var serviceResult = accountService.Withdraw(accountNumber, depositAmount);
 
             if (serviceResult.Status == AccountServiceResultsStatus.Success)
             {
-                return new CommandResult() { CommandResultStatus = CommandResultStatus.Success, Amount = serviceResult.Amount };
+                return new CommandResult() { CommandResultStatus = CommandResultStatus.Success };
             }
             else
             {

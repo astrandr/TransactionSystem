@@ -23,7 +23,12 @@
             }
 
             var accountNumber = parameters[0];
-  
+
+            if (string.IsNullOrEmpty(accountNumber))
+            {
+                return new InterpreterResult() { Matched = true, Command = null, Status = InterpreterResultStatus.InvalidValue };
+            }
+
             return new InterpreterResult()
             {
                 Matched = true,

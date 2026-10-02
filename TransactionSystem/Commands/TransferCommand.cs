@@ -21,7 +21,7 @@ namespace TransactionSystem.UI.Commands
 
             if (serviceResult.Status == AccountServiceResultsStatus.Success)
             {
-                return new CommandResult() { CommandResultStatus = CommandResultStatus.Success, Amount = serviceResult.Amount };
+                return new CommandResult() { CommandResultStatus = CommandResultStatus.Success };
             }
             else
             {

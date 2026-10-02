@@ -25,6 +25,11 @@
             var accountNumber = parameters[0];
             var withdrawAmount = parameters[1];
 
+            if (string.IsNullOrEmpty(accountNumber) || string.IsNullOrEmpty(withdrawAmount))
+            {
+                return new InterpreterResult() { Matched = true, Command = null, Status = InterpreterResultStatus.InvalidValue };
+            }
+
             if (decimal.TryParse(withdrawAmount, out decimal withdrawAmountValue))
             {
                 if (withdrawAmountValue < 0)

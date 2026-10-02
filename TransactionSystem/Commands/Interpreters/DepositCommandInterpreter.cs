@@ -4,7 +4,7 @@
     {
         public InterpreterResult CreateCommand(string commandLine)
         {
-            if (commandLine.IndexOf("DEPOSIT :") != 0) return new InterpreterResult() { Matched = false }; 
+            if (commandLine.IndexOf("DEPOSIT :") != 0) return new InterpreterResult() { Matched = false };
 
             string[] tokens = commandLine.Split(new char[] { ':' }, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
 
@@ -24,6 +24,11 @@
 
             var accountNumber = parameters[0];
             var depositAmount = parameters[1];
+
+            if (string.IsNullOrEmpty(accountNumber) || string.IsNullOrEmpty(depositAmount))
+            {
+                return new InterpreterResult() { Matched = true, Command = null, Status = InterpreterResultStatus.InvalidValue };
+            }
 
             if (decimal.TryParse(depositAmount, out decimal depositAmountValue))
             {
