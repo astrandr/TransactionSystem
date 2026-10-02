@@ -15,26 +15,19 @@ namespace TransactionSystem.UI.Commands
 
         public CommandResult Execute(Context context)
         {
-            try
-            {
-                var serviceResult = context.AccountService.Deposit(accountNumber, depositAmount);
+            var serviceResult = context.AccountService.Deposit(accountNumber, depositAmount);
 
-                if (serviceResult.Status == AccountServiceResultsStatus.Success)
-                {
-                    return new CommandResult() { CommandResultStatus = CommandResultStatus.Success };
-                }
-                else
-                {
-                    return new CommandResult()
-                    {
-                        CommandResultStatus = CommandResultStatus.ServiceError,
-                        AccountServiceResult = serviceResult
-                    };
-                }
-            }
-            catch
+            if (serviceResult.Status == AccountServiceResultsStatus.Success)
             {
-                return new CommandResult() { CommandResultStatus = CommandResultStatus.UknownError };
+                return new CommandResult() { CommandResultStatus = CommandResultStatus.Success };
+            }
+            else
+            {
+                return new CommandResult()
+                {
+                    CommandResultStatus = CommandResultStatus.ServiceError,
+                    AccountServiceResult = serviceResult
+                };
             }
         }
     }

@@ -13,7 +13,7 @@ namespace TransactionSystem.UI
         private const string UnknownCommandMessage = "Unknown command";
         private const string InvalidCommandMessage = "Invalid command structure/parameters";
 
-        private readonly IEnumerable<string> CommandsHelpLines = new List<string>()
+        public static readonly IEnumerable<string> CommandsHelpLines = new List<string>()
         {
             "create : {user name}, {account number}, {initial deposit amount}",
             "balance : {account number} ",
@@ -94,14 +94,6 @@ namespace TransactionSystem.UI
             }
 
             return string.Empty;
-        }
-
-        public void WriteHelpLines()
-        {
-            foreach (var helpLine in CommandsHelpLines)
-            {
-                Console.WriteLine(helpLine);
-            }
         }
     }
 }

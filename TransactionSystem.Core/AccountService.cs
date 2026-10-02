@@ -12,19 +12,19 @@
 
         public AccountServiceResult CreateAccount(string userName, string accountNumber, decimal depositAmount)
         {
-            lock (accountLocks) 
+            lock (accountLocks)
             {
-                if (accountRepository.Accounts.ContainsKey(accountNumber))
+                if (accountRepository.TryGetAccount(accountNumber, out Account account))
                 {
                     return new AccountServiceResult() { Status = AccountServiceResultsStatus.ExistingAccount };
                 }
 
-                if(depositAmount <= 0)
+                if (depositAmount <= 0)
                 {
                     return new AccountServiceResult() { Status = AccountServiceResultsStatus.InvalidAmountValue };
                 }
 
-                accountRepository.Accounts.Add(accountNumber, new Account() { Number = accountNumber, User = userName, Amount = depositAmount });
+                accountRepository.AddAccount(accountNumber, new Account() { Number = accountNumber, User = userName, Amount = depositAmount });
                 accountLocks.Add(accountNumber, new object());
             }
 
@@ -33,9 +33,16 @@
 
         public AccountServiceResult Deposit(string accountNumber, decimal depositAmount)
         {
+            if (depositAmount <= 0)
+            {
+                return new AccountServiceResult() { Status = AccountServiceResultsStatus.InvalidAmountValue };
+            }
+
+            Account account;
+
             lock (accountLocks)
             {
-                if (!accountRepository.Accounts.ContainsKey(accountNumber))
+                if (!accountRepository.TryGetAccount(accountNumber, out account))
                 {
                     return new AccountServiceResult() { Status = AccountServiceResultsStatus.NonExistingAccount };
                 }
@@ -43,7 +50,7 @@
 
             lock (accountLocks[accountNumber])
             {
-                accountRepository.Accounts[accountNumber].Amount += depositAmount;
+                account.Amount += depositAmount;
             }
 
             return new AccountServiceResult() { Status = AccountServiceResultsStatus.Success, Amount = depositAmount };
@@ -51,32 +58,50 @@
 
         public AccountServiceResult Withdraw(string accountNumber, decimal withdrawAmount)
         {
+
+            Account account;
+
             lock (accountLocks)
             {
-                if (!accountRepository.Accounts.ContainsKey(accountNumber))
+                if (!accountRepository.TryGetAccount(accountNumber, out account))
                 {
                     return new AccountServiceResult() { Status = AccountServiceResultsStatus.NonExistingAccount };
                 }
-            }
 
-            lock (accountLocks[accountNumber])
-            {
-                var actualWithdrawAmmount = withdrawAmount < accountRepository.Accounts[accountNumber].Amount ? withdrawAmount : accountRepository.Accounts[accountNumber].Amount;
+                lock (accountLocks[accountNumber])
+                {
+                    if (withdrawAmount > account.Amount)
+                    {
+                        return new AccountServiceResult() { Status = AccountServiceResultsStatus.InsufficientFunds };
+                    }
 
-                accountRepository.Accounts[accountNumber].Amount -= actualWithdrawAmmount;
+                    account.Amount -= withdrawAmount;
 
-                return new AccountServiceResult() { Status = AccountServiceResultsStatus.Success, Amount = actualWithdrawAmmount };
+                    return new AccountServiceResult() { Status = AccountServiceResultsStatus.Success };
+                }
             }
         }
 
         public AccountServiceResult GetAccountBalance(string accountNumber)
         {
-            if (!accountRepository.Accounts.ContainsKey(accountNumber))
+
+            Account account;
+
+            lock (accountLocks)
             {
-                return new AccountServiceResult() { Status = AccountServiceResultsStatus.NonExistingAccount };
+                if (!accountRepository.TryGetAccount(accountNumber, out account))
+                {
+                    return new AccountServiceResult() { Status = AccountServiceResultsStatus.NonExistingAccount };
+                }
             }
 
-            return new AccountServiceResult() { Status = AccountServiceResultsStatus.Success, Amount = accountRepository.Accounts[accountNumber].Amount };
+            decimal accountbalance = 0;
+            lock (accountLocks[accountNumber])
+            {
+                accountbalance = account.Amount;
+            }
+
+            return new AccountServiceResult() { Status = AccountServiceResultsStatus.Success, Amount = accountbalance };
         }
     }
 }

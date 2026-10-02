@@ -10,21 +10,32 @@ namespace TransactionSystem.UI
             var processor = new ShellProcessor(context);
 
             Console.WriteLine("Usage:");
-            processor.WriteHelpLines();
+            WriteHelpLines();
             Console.WriteLine();
 
             while(true)
             {
-                var commandLine = Console.ReadLine().ToUpper();
-                
-                if (commandLine.IndexOf("QUIT") >= 0) return;
-
-                var executionResultMessage = processor.ProcessCommandLine(commandLine);
-               
-                if (!string.IsNullOrEmpty(executionResultMessage))
+                var commandLine = Console.ReadLine()?.ToUpper();
+                if (commandLine != null)
                 {
-                    Console.WriteLine(executionResultMessage);
+
+                    if (commandLine.Trim().Equals("QUIT")) return;
+
+                    var executionResultMessage = processor.ProcessCommandLine(commandLine);
+
+                    if (!string.IsNullOrEmpty(executionResultMessage))
+                    {
+                        Console.WriteLine(executionResultMessage);
+                    }
                 }
+            }
+        }
+
+        private static void WriteHelpLines()
+        {
+            foreach (var helpLine in ShellProcessor.CommandsHelpLines)
+            {
+                Console.WriteLine(helpLine);
             }
         }
     }
