@@ -115,7 +115,7 @@
             lock (accountLocks)
             {
                 if (!accountLocks.ContainsKey(srcAccountNumber))
-                    new AccountServiceResult() { Status = AccountServiceResultsStatus.NonExistingSourceAccount };
+                    return new AccountServiceResult() { Status = AccountServiceResultsStatus.NonExistingSourceAccount };
 
                 if (!accountLocks.ContainsKey(destAccountNumber))
                     return new AccountServiceResult() { Status = AccountServiceResultsStatus.NonExistingDestAccount };
