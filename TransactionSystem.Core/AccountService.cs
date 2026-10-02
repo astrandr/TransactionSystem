@@ -114,15 +114,11 @@
 
             lock (accountLocks)
             {
-                if (!accountLocks.ContainsKey(firstLockAccountNumber))
-                {
-                    return new AccountServiceResult() { Status = AccountServiceResultsStatus.NonExistingSourceAccount };
-                }
+                if (!accountLocks.ContainsKey(srcAccountNumber))
+                    new AccountServiceResult() { Status = AccountServiceResultsStatus.NonExistingSourceAccount };
 
-                if (!accountLocks.ContainsKey(secondLockAccountNumber))
-                {
+                if (!accountLocks.ContainsKey(destAccountNumber))
                     return new AccountServiceResult() { Status = AccountServiceResultsStatus.NonExistingDestAccount };
-                }
 
                 firstLock = accountLocks[firstLockAccountNumber];
                 secondLock = accountLocks[secondLockAccountNumber];
